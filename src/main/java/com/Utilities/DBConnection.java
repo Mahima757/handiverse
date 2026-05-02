@@ -1,17 +1,32 @@
 package com.Utilities;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static final String DB_NAME = "handiverse_db";
-    private static final String USER = "root";
-    private static final String PASSWORD = "";
-    private static final String URL = "jdbc:mysql://localhost:3306/" + DB_NAME;
+    private static Connection conn;
 
-    public static Connection getConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    public static Connection getConnection() {
+
+        try {
+
+            if (conn == null || conn.isClosed()) {
+
+                String url =
+                        "jdbc:mysql://localhost:3306/handiverse_db?useSSL=false&serverTimezone=UTC";
+
+                String user = "root";
+                String password = "";
+
+                conn = DriverManager.getConnection(url, user, password);
+
+                System.out.println("✅ Database Connected");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return conn;
     }
-    }
+}

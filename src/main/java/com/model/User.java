@@ -5,19 +5,18 @@ public class User {
 	    private String fullName;
 	    private String email;
 	    private String password;    // Stored as BCrypt hash
-	    private int    roleId;
-	    private String roleName;    // Joined from Role table (not a DB column)
+	    private String role;
 	 
 	    // ─── Constructors ─────────────────────────────────────────────────────────
 	 
 	    public User() {}
 	 
-	    public User(int userId, String fullName, String email, String password, int roleId) {
+	    public User(int userId, String fullName, String email, String password, String role) {
 	        this.userId   = userId;
 	        this.fullName = fullName;
 	        this.email    = email;
 	        this.password = password;
-	        this.roleId   = roleId;
+	        this.role = role;
 	    }
 	 
 	    // ─── Getters & Setters ────────────────────────────────────────────────────
@@ -54,29 +53,22 @@ public class User {
 	        this.password = password;
 	    }
 	 
-	    public int getRoleId() {
-	        return roleId;
+	    public String getRole() {
+	        return role;
 	    }
 	 
-	    public void setRoleId(int roleId) {
-	        this.roleId = roleId;
+	    public void setRole(String role) {
+	        this.role = role;
 	    }
 	 
-	    public String getRoleName() {
-	        return roleName;
-	    }
-	 
-	    public void setRoleName(String roleName) {
-	        this.roleName = roleName;
-	    }
-	 
+
 	    // ─── Convenience Helpers ─────────────────────────────────────────────────
 	 
 	    /**
 	     * Returns true if this user has the Admin role.
 	     */
 	    public boolean isAdmin() {
-	        return "Admin".equalsIgnoreCase(roleName);
+	        return "Admin".equalsIgnoreCase(role);
 	    }
 	 
 	    @Override
@@ -84,6 +76,6 @@ public class User {
 	        return "User{userId=" + userId
 	             + ", fullName='" + fullName + "'"
 	             + ", email='"    + email    + "'"
-	             + ", roleId="    + roleId   + "}";
+	             + ", role="    + role   + "}";
 	    }
 }
