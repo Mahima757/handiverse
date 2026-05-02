@@ -11,7 +11,7 @@ package com.Utilities;
 	    	 ProductDAO dao = new ProductDAO();
 	     // Create a sample product
 	        Product p = new Product(
-	                1,"Clay Pot",
+	                0,"Clay Pot",
 	                500.0,
 	                10,
 	                "claypot.jpg",
