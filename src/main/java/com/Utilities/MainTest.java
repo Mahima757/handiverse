@@ -1,19 +1,33 @@
 package com.Utilities;
 
-	import com.dao.UserDAO;
-	import com.model.User;
+	
+	import com.dao.ProductDAO;
+	import com.model.Product;
+
 
 	public class MainTest {
 
 	    public static void main(String[] args) {
+	    	 ProductDAO dao = new ProductDAO();
+	     // Create a sample product
+	        Product p = new Product(
+	                1,"Clay Pot",
+	                500.0,
+	                10,
+	                "claypot.jpg",
+	                "Handmade traditional clay pot",
+	                1   // Category_ID (example: 1 = Pottery)
+	        );
 
-	        UserDAO dao = new UserDAO();
+	        // Insert product into database
+	        boolean result = dao.addProduct(p);
 
-	        User user = new User(1, "Jeeya B.K.", "jeeya@test.com", "123", "ADMIN");
+	        if (result) {
+	            System.out.println("✅ Product Added Successfully!");
+	        } else {
+	            System.out.println("❌ Failed to Add Product!");
+	        }
 
-	        dao.addUser(user);
-
-	        System.out.println("User Inserted!");
 	    }
 	}
 

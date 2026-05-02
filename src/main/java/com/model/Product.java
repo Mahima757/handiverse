@@ -1,7 +1,7 @@
 package com.model;
 
 public class Product {
-	  private int    productId;
+	    private int    productId;
 	    private String productName;
 	    private double price;
 	    private String image;           // File name stored in /images/products/
@@ -12,10 +12,9 @@ public class Product {
 	 
 	    // ─── Constructors ─────────────────────────────────────────────────────────
 	 
-	    public Product() {}
 	 
 	    public Product(int productId, String productName, double price,
-	                   String image, int quantity, String description, int categoryId) {
+	                   int quantity, String image, String description, int categoryId) {
 	        this.productId   = productId;
 	        this.productName = productName;
 	        this.price       = price;
