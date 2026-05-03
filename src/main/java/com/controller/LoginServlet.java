@@ -1,9 +1,11 @@
 package com.controller;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
+import com.Utilities.DBConnection;
+import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
+import java.sql.*;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -12,7 +14,7 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("${pageContext.request.contextPath}/WEB-INF/pages/login.jsp")
+        request.getRequestDispatcher("/WEB-INF/pages/login.jsp")
                .forward(request, response);
     }
 
@@ -23,12 +25,31 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        if ("admin@gmail.com".equals(email) && "1234".equals(password)) {
-            response.sendRedirect(request.getContextPath() + "/home");
-        } else {
-            request.setAttribute("error", "Invalid credentials");
-            request.getRequestDispatcher("${pageContext.request.contextPath}/WEB-INF/pages/login.jsp")
-                   .forward(request, response);
+        try {
+            Connection conn = DBConnection.getConnection();
+
+            String sql = "SELECT * FROM users WHERE email=? AND password=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                HttpSession session = request.getSession();
+                session.setAttribute("user", rs.getString("email"));
+                session.setAttribute("role", rs.getString("role"));
+
+                response.sendRedirect(request.getContextPath() + "/home");
+
+            } else {
+                request.setAttribute("error", "Invalid credentials");
+                request.getRequestDispatcher("/WEB-INF/pages/login.jsp")
+                       .forward(request, response);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
