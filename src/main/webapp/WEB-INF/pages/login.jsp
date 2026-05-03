@@ -20,7 +20,7 @@
             background: #f5f1ee;
         }
 
-        /* NAVBAR */
+        /* NAVBAR */   
         .navbar {
             display: flex;
             justify-content: space-between;
