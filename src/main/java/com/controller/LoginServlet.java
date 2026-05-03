@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("user", rs.getString("email"));
                 session.setAttribute("role", rs.getString("role"));
 
-                response.sendRedirect(request.getContextPath() + "/home");
+                response.sendRedirect(request.getContextPath() + "/login");
 
             } else {
                 request.setAttribute("error", "Invalid credentials");
