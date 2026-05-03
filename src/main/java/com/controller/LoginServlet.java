@@ -14,7 +14,7 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("/WEB-INF/pages/login.jsp")
+        request.getRequestDispatcher("/WEB-INF/login.jsp")
                .forward(request, response);
     }
 
@@ -44,7 +44,7 @@ public class LoginServlet extends HttpServlet {
 
             } else {
                 request.setAttribute("error", "Invalid credentials");
-                request.getRequestDispatcher("/WEB-INF/pages/login.jsp")
+                request.getRequestDispatcher("/WEB-INF/login.jsp")
                        .forward(request, response);
             }
 
