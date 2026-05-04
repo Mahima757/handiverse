@@ -24,20 +24,22 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     	
-    		System.out.println("REGISTER SERVLET HIT");
-
-    	    String name = request.getParameter("name");
-    	    String email = request.getParameter("email");
-    	    String password = request.getParameter("password");
-
-    	    System.out.println("Name: " + name);
-    	    System.out.println("Email: " + email);
-
+    	 String fullName = request.getParameter("fullName");
+         String email = request.getParameter("email");
+         String password = request.getParameter("password");
+    		
         try {
             Connection conn = DBConnection.getConnection();
 
-            // check if user already exists
-            String checkSql = "SELECT * FROM users WHERE email=?";
+            if (conn == null) {
+                request.setAttribute("error", "Database connection failed.");
+                request.getRequestDispatcher("/WEB-INF/register.jsp")
+                       .forward(request, response);
+                return;
+            }
+
+            // Check whether email already exists
+            String checkSql = "SELECT * FROM users WHERE Email = ?";
             PreparedStatement checkPs = conn.prepareStatement(checkSql);
             checkPs.setString(1, email);
 
@@ -51,21 +53,24 @@ public class RegisterServlet extends HttpServlet {
                 return;
             }
 
-            // insert new user
-            String sql = "INSERT INTO users (Full_Name, Email, Password, role) VALUES (?, ?, ?, 'CUSTOMER')";
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            ps.setString(1, name);
+         // Insert new user
+            String insertSql = "INSERT INTO users (Full_Name, Email, Password, role) VALUES (?, ?, ?, ?)";
+            PreparedStatement ps = conn.prepareStatement(insertSql);
+            ps.setString(1, fullName);
             ps.setString(2, email);
             ps.setString(3, password);
+            ps.setString(4, "USER");
 
-            int result = ps.executeUpdate();
-            System.out.println("Insert result: " + result);
 
-            if (result > 0) {
-                response.sendRedirect(request.getContextPath() + "/login");
+            int rows = ps.executeUpdate();
+            
+            if (rows > 0) {
+                request.setAttribute("success", "Registration successful. Please login.");
+                request.getRequestDispatcher("/WEB-INF/login.jsp")
+                       .forward(request, response);
+                
             } else {
-                request.setAttribute("error", "Registration failed");
+            	   request.setAttribute("error", "Registration failed. Please try again.");
                 request.getRequestDispatcher("/WEB-INF/register.jsp")
                        .forward(request, response);
             }
@@ -73,6 +78,11 @@ public class RegisterServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
+            request.setAttribute("error", "Server error. Please check database connection and column names.");
+            request.getRequestDispatcher("/WEB-INF/register.jsp")
+                   .forward(request, response);
         }
-    }
+            
+        }
+    
 }

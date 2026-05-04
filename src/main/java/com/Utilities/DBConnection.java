@@ -12,6 +12,9 @@ public class DBConnection {
         try {
 
             if (conn == null || conn.isClosed()) {
+            	
+            	Class.forName("com.mysql.cj.jdbc.Driver");
+
 
                 String url =
                         "jdbc:mysql://localhost:3306/handiverse_db?useSSL=false&serverTimezone=UTC";
