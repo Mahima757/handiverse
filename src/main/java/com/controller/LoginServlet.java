@@ -27,15 +27,8 @@ public class LoginServlet extends HttpServlet {
 
         try {
             Connection conn = DBConnection.getConnection();
-            
-            if (conn == null) {
-                request.setAttribute("error", "Database connection failed.");
-                request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
-                return;
-            }
 
-            String sql = "SELECT * FROM users WHERE Email=? AND Password=?";
-            
+            String sql = "SELECT * FROM users WHERE email=? AND password=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, email);
             ps.setString(2, password);
@@ -44,11 +37,11 @@ public class LoginServlet extends HttpServlet {
 
             if (rs.next()) {
                 HttpSession session = request.getSession();
-                
                 session.setAttribute("user", rs.getString("email"));
                 session.setAttribute("role", rs.getString("role"));
 
-                response.sendRedirect(request.getContextPath() + "/home"); 
+                response.sendRedirect(request.getContextPath() + "/login");
+
             } else {
                 request.setAttribute("error", "Invalid credentials");
                 request.getRequestDispatcher("/WEB-INF/login.jsp")
@@ -57,9 +50,6 @@ public class LoginServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Server error");
-            request.getRequestDispatcher("/WEB-INF/login.jsp")
-                   .forward(request, response);
         }
     }
-}  
+}

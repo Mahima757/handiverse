@@ -1,13 +1,12 @@
 package com.controller;
 
 import com.Utilities.DBConnection;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.WebServlet;
+
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
@@ -18,67 +17,62 @@ public class RegisterServlet extends HttpServlet {
 
         request.getRequestDispatcher("/WEB-INF/register.jsp")
                .forward(request, response);
+        System.out.println("REGISTER PAGE LOADED");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	
+    		System.out.println("REGISTER SERVLET HIT");
 
-        String fullName = request.getParameter("fullName");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
+    	    String name = request.getParameter("name");
+    	    String email = request.getParameter("email");
+    	    String password = request.getParameter("password");
+
+    	    System.out.println("Name: " + name);
+    	    System.out.println("Email: " + email);
 
         try {
             Connection conn = DBConnection.getConnection();
 
-            if (conn == null) {
-                request.setAttribute("error", "Database connection failed.");
-                request.getRequestDispatcher("/WEB-INF/register.jsp")
-                       .forward(request, response);
-                return;
-            }
-
-            // Check whether email already exists
-            String checkSql = "SELECT * FROM users WHERE Email = ?";
+            // check if user already exists
+            String checkSql = "SELECT * FROM users WHERE email=?";
             PreparedStatement checkPs = conn.prepareStatement(checkSql);
             checkPs.setString(1, email);
 
             ResultSet rs = checkPs.executeQuery();
+           
 
             if (rs.next()) {
-                request.setAttribute("error", "This email is already registered. Please login.");
+                request.setAttribute("error", "Email already exists");
                 request.getRequestDispatcher("/WEB-INF/register.jsp")
                        .forward(request, response);
                 return;
             }
 
-            // Insert new user
-            String insertSql = "INSERT INTO users (Full_Name, Email, Password, role) VALUES (?, ?, ?, ?)";
-            PreparedStatement ps = conn.prepareStatement(insertSql);
+            // insert new user
+            String sql = "INSERT INTO users (Full_Name, Email, Password, role) VALUES (?, ?, ?, 'CUSTOMER')";
+            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setString(1, fullName);
+            ps.setString(1, name);
             ps.setString(2, email);
             ps.setString(3, password);
-            ps.setString(4, "USER");
 
-            int rows = ps.executeUpdate();
+            int result = ps.executeUpdate();
+            System.out.println("Insert result: " + result);
 
-            if (rows > 0) {
-                request.setAttribute("success", "Registration successful. Please login.");
-                request.getRequestDispatcher("/WEB-INF/login.jsp")
-                       .forward(request, response);
+            if (result > 0) {
+                response.sendRedirect(request.getContextPath() + "/login");
             } else {
-                request.setAttribute("error", "Registration failed. Please try again.");
+                request.setAttribute("error", "Registration failed");
                 request.getRequestDispatcher("/WEB-INF/register.jsp")
                        .forward(request, response);
             }
+            
 
         } catch (Exception e) {
             e.printStackTrace();
-
-            request.setAttribute("error", "Server error. Please check database connection and column names.");
-            request.getRequestDispatcher("/WEB-INF/register.jsp")
-                   .forward(request, response);
         }
     }
 }

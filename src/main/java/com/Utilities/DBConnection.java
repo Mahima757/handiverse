@@ -10,17 +10,18 @@ public class DBConnection {
     public static Connection getConnection() {
 
         try {
+
             if (conn == null || conn.isClosed()) {
 
-                Class.forName("com.mysql.cj.jdbc.Driver");
+                String url =
+                        "jdbc:mysql://localhost:3306/handiverse_db?useSSL=false&serverTimezone=UTC";
 
-                String url = "jdbc:mysql://localhost:3306/handiverse?useSSL=false&serverTimezone=UTC";
                 String user = "root";
                 String password = "";
 
                 conn = DriverManager.getConnection(url, user, password);
 
-                System.out.println("Database connected successfully");
+                System.out.println("✅ Database Connected");
             }
 
         } catch (Exception e) {

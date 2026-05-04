@@ -6,9 +6,7 @@
 <html>
 <head>
     <title>HandiVerse</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home.css">
-    
 </head>
 <body>
 
@@ -17,40 +15,35 @@
 ====================== -->
 <nav class="navbar">
 
-    <div class="logo">
-        <a href="${pageContext.request.contextPath}/home">HandiVerse</a>
-    </div>
+    <div class="logo">HandiVerse</div>
 
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/home"
-           class="${activePage eq 'home' ? 'active' : ''}">Home</a>
+    <ul>
+        <li>
+            <a href="${pageContext.request.contextPath}/home"
+               class="${activePage eq 'home' ? 'active' : ''}">Home</a>
+        </li>
+        <li><a href="${pageContext.request.contextPath}/shop">Shop</a></li>
+        <li><a href="#">Categories</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+    </ul>
 
-        <a href="${pageContext.request.contextPath}/shop">Shop</a>
-        <a href="#">Categories</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
-    </div>
-
-    <div class="nav-right">
-        <input type="text" class="search-box" placeholder="Search crafts...">
-
-        <a href="${pageContext.request.contextPath}/cart" class="cart-icon">🛒</a>
-
+    <div class="nav-auth">
         <c:choose>
-            <c:when test="${not empty sessionScope.email}">
-                <span class="welcome-user">Welcome, ${sessionScope.fullName}</span>
-                <a class="btn-login" href="${pageContext.request.contextPath}/profile">Profile</a>
+            <c:when test="${not empty sessionScope.loggedUser}">
+                <span class="welcome-user">Welcome, ${sessionScope.loggedUser.fullName}</span>
+                <a class="btn-login"    href="${pageContext.request.contextPath}/profile">Profile</a>
                 <a class="btn-register" href="${pageContext.request.contextPath}/logout">Logout</a>
             </c:when>
-
             <c:otherwise>
-                <a class="btn-login" href="${pageContext.request.contextPath}/login">Login</a>
+                <a class="btn-login"    href="${pageContext.request.contextPath}/login">Login</a>
                 <a class="btn-register" href="${pageContext.request.contextPath}/register">Register</a>
             </c:otherwise>
         </c:choose>
     </div>
 
 </nav>
+
 
 <!-- ================================================
      HERO
