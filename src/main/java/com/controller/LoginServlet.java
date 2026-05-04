@@ -44,7 +44,7 @@ public class LoginServlet extends HttpServlet {
 
             } else {
                 request.setAttribute("error", "Invalid credentials");
-                request.getRequestDispatcher("/WEB-INF/login.jsp")
+                request.getRequestDispatcher("/WEB-INF/home.jsp")
                        .forward(request, response);
             }
 
