@@ -29,6 +29,20 @@
     </ul>
 
     <div class="nav-auth">
+
+        <%-- CART ICON WITH BADGE --%>
+        <a href="${pageContext.request.contextPath}/cart" class="nav-cart" title="View Cart">
+            <svg class="cart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            <c:if test="${not empty sessionScope.cartCount and sessionScope.cartCount > 0}">
+                <span class="cart-badge">${sessionScope.cartCount}</span>
+            </c:if>
+        </a>
+
+        <%-- LOGIN / REGISTER or PROFILE / LOGOUT --%>
         <c:choose>
             <c:when test="${not empty sessionScope.loggedUser}">
                 <span class="welcome-user">Welcome, ${sessionScope.loggedUser.fullName}</span>
@@ -40,6 +54,7 @@
                 <a class="btn-register" href="${pageContext.request.contextPath}/register">Register</a>
             </c:otherwise>
         </c:choose>
+
     </div>
 
 </nav>

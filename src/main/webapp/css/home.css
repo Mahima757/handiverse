@@ -1,5 +1,10 @@
+/* ============================================================
+   HANDIVERSE — HOME PAGE CSS
+   Warm artisan aesthetic | Pokhara, Nepal
+   ============================================================ */
+
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap');
- 
+
 /* ─── Variables ──────────────────────────────────────────── */
 :root {
     --cream:      #FAF7F3;
@@ -18,7 +23,7 @@
     --shadow-sm:  0 2px 12px rgba(0,0,0,0.06);
     --shadow-md:  0 8px 28px rgba(0,0,0,0.10);
 }
- 
+
 /* ─── Reset & Base ───────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -32,7 +37,7 @@ body {
 img  { display: block; max-width: 100%; height: auto; }
 a    { text-decoration: none; color: inherit; }
 ul   { list-style: none; }
- 
+
 /* ─── NAVBAR (your original styles kept) ────────────────── */
 .navbar {
     display:          flex;
@@ -68,9 +73,51 @@ ul   { list-style: none; }
 }
 .navbar a.active { color: var(--rose); font-weight: 600; }
 .navbar a:hover  { color: var(--rose); }
- 
+
 .nav-auth          { display: flex; align-items: center; gap: 12px; }
 .welcome-user      { font-size: 13px; color: #555; }
+
+/* ── Cart Icon ─────────────────────────────────────────── */
+.nav-cart {
+    position:    relative;
+    display:     flex;
+    align-items: center;
+    color:       #555;
+    font-size:   1.15rem;
+    transition:  color 0.25s;
+    line-height: 1;
+    padding:     4px;
+}
+.nav-cart:hover { color: var(--rose); }
+
+.cart-icon {
+    width:  22px;
+    height: 22px;
+    fill:   none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap:  round;
+    stroke-linejoin: round;
+}
+
+.cart-badge {
+    position:        absolute;
+    top:             -6px;
+    right:           -7px;
+    background:      var(--rose);
+    color:           white;
+    font-size:       0.58rem;
+    font-weight:     700;
+    min-width:       17px;
+    height:          17px;
+    border-radius:   50%;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    padding:         0 3px;
+    border:          2px solid white;
+    line-height:     1;
+}
 .btn-login {
     padding:         7px 16px;
     border:          1px solid var(--rose);
@@ -92,8 +139,8 @@ ul   { list-style: none; }
     letter-spacing:  0.05em;
     transition:      background 0.25s;
 }
-.btn-register:hover { background: var(--charcoal); }
- 
+.btn-register:hover { background: white; }
+
 /* ─── HERO ───────────────────────────────────────────────── */
 .hero {
     position:        relative;
@@ -106,7 +153,7 @@ ul   { list-style: none; }
     text-align:      center;   /* ← center all text */
     overflow:        hidden;
 }
- 
+
 /* <img> acts as the background — fills the whole section */
 .hero-bg-img {
     position:   absolute;
@@ -117,7 +164,7 @@ ul   { list-style: none; }
     object-position: center;
     z-index:    0;
 }
- 
+
 /* Dark semi-transparent overlay over the whole image */
 .hero-overlay {
     position:   absolute;
@@ -125,7 +172,7 @@ ul   { list-style: none; }
     background: rgba(20, 15, 12, 0.42);  /* dark wash over image */
     z-index:    1;
 }
- 
+
 .hero-content {
     position:        relative;
     z-index:         2;
@@ -136,7 +183,7 @@ ul   { list-style: none; }
     max-width:       700px;
     width:           100%;
 }
- 
+
 .hero-eyebrow {
     font-size:      0.7rem;
     font-weight:    500;
@@ -145,7 +192,7 @@ ul   { list-style: none; }
     color:          rgba(255,255,255,0.72);  /* white on dark bg */
     margin-bottom:  14px;
 }
- 
+
 .hero-content h1 {
     font-family:   var(--serif);
     font-size:     clamp(2.4rem, 6vw, 4.2rem);
@@ -154,7 +201,7 @@ ul   { list-style: none; }
     color:         #ffffff;   /* white text on image */
     margin-bottom: 20px;
 }
- 
+
 .hero-sub {
     font-size:     0.93rem;
     color:         rgba(255,255,255,0.78);
@@ -162,14 +209,14 @@ ul   { list-style: none; }
     max-width:     480px;
     margin-bottom: 34px;
 }
- 
+
 .hero-btns {
     display:         flex;
     gap:             14px;
     flex-wrap:       wrap;
     justify-content: center;  /* ← center the buttons too */
 }
- 
+
 .btn-primary {
     display:        inline-block;
     background:     var(--rose);
@@ -185,7 +232,7 @@ ul   { list-style: none; }
     transition:     background 0.25s;
 }
 .btn-primary:hover { background: var(--rose-dark); }
- 
+
 .btn-outline {
     display:        inline-block;
     background:     transparent;
@@ -197,11 +244,11 @@ ul   { list-style: none; }
     text-transform: uppercase;
     padding:        12px 28px;
     border-radius:  4px;
-    border:         1.5px solid var(--charcoal);
+    border:         1.5px solid white;
     transition:     all 0.25s;
 }
 .btn-outline:hover { background: var(--charcoal); color: white; }
- 
+
 /* ─── SECTION HEADER SHARED ──────────────────────────────── */
 .section-head {
     display:         flex;
@@ -232,10 +279,10 @@ ul   { list-style: none; }
     transition:      color 0.25s, border-color 0.25s;
 }
 .view-all:hover { color: var(--rose); border-color: var(--rose); }
- 
+
 /* ─── COLLECTIONS ────────────────────────────────────────── */
 .collections { padding: 72px 60px; }
- 
+
 .collection-grid {
     display:               grid;
     grid-template-columns: 1.15fr 1fr;
@@ -243,7 +290,7 @@ ul   { list-style: none; }
     gap:                   16px;
     min-height:            460px;
 }
- 
+
 .col-card {
     position:      relative;
     border-radius: var(--radius);
@@ -258,7 +305,7 @@ ul   { list-style: none; }
     transition: transform 0.5s ease;
 }
 .col-card:hover img { transform: scale(1.05); }
- 
+
 .col-label {
     position:   absolute;
     bottom:     0; left: 0; right: 0;
@@ -273,16 +320,16 @@ ul   { list-style: none; }
     margin-bottom: 4px;
 }
 .col-label p { font-size: 0.76rem; opacity: 0.76; }
- 
+
 /* ─── PRODUCTS ───────────────────────────────────────────── */
 .products { padding: 0 60px 80px; }
- 
+
 .product-grid {
     display:               grid;
     grid-template-columns: repeat(4, 1fr);
     gap:                   22px;
 }
- 
+
 .product-card {
     background:    white;
     border-radius: var(--radius);
@@ -294,7 +341,7 @@ ul   { list-style: none; }
     box-shadow: var(--shadow-md);
     transform:  translateY(-3px);
 }
- 
+
 .product-img-wrap {
     position:     relative;
     overflow:     hidden;
@@ -308,7 +355,7 @@ ul   { list-style: none; }
     transition: transform 0.5s;
 }
 .product-card:hover .product-img-wrap img { transform: scale(1.06); }
- 
+
 .product-badge {
     position:       absolute;
     top:            12px; left: 12px;
@@ -321,7 +368,7 @@ ul   { list-style: none; }
     padding:        3px 10px;
     border-radius:  20px;
 }
- 
+
 .product-info { padding: 14px 16px 18px; }
 .product-info h3 {
     font-family:   var(--serif);
@@ -338,7 +385,7 @@ ul   { list-style: none; }
     color:         var(--gray);
     margin-bottom: 10px;
 }
- 
+
 .product-footer {
     display:         flex;
     justify-content: space-between;
@@ -349,7 +396,7 @@ ul   { list-style: none; }
     font-weight: 600;
     color:       var(--charcoal);
 }
- 
+
 .add-cart-btn {
     background:    var(--rose-light);
     color:         var(--rose-dark);
@@ -367,7 +414,7 @@ ul   { list-style: none; }
     line-height:   1;
 }
 .add-cart-btn:hover { background: var(--rose); color: white; }
- 
+
 .empty-msg {
     grid-column: 1 / -1;
     text-align:  center;
@@ -375,7 +422,7 @@ ul   { list-style: none; }
     color:       var(--gray);
     font-size:   0.9rem;
 }
- 
+
 /* ─── TESTIMONIALS ───────────────────────────────────────── */
 .testimonials {
     background: var(--warm);
@@ -384,7 +431,7 @@ ul   { list-style: none; }
     gap:        56px;
     align-items: flex-start;
 }
- 
+
 .testimonials-left { flex: 0 0 260px; }
 .testimonials-left h2 {
     font-family:   var(--serif);
@@ -414,9 +461,9 @@ ul   { list-style: none; }
     transition:      all 0.25s;
 }
 .testi-arrow:hover { border-color: var(--rose); color: var(--rose); }
- 
+
 .testimonials-right { display: flex; gap: 18px; flex: 1; }
- 
+
 .testimonial-box {
     background:    white;
     padding:       28px 24px;
@@ -451,14 +498,14 @@ ul   { list-style: none; }
 }
 .testi-author strong { display: block; font-size: 0.87rem; color: var(--dark); }
 .testi-author span   { font-size: 0.74rem; color: var(--gray); }
- 
+
 /* ─── FOOTER ─────────────────────────────────────────────── */
 footer {
     background: var(--footer-bg);
     color:      rgba(255,255,255,0.52);
     padding:    60px 60px 26px;
 }
- 
+
 .footer-grid {
     display:               grid;
     grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
@@ -467,7 +514,7 @@ footer {
     border-bottom:         1px solid rgba(255,255,255,0.08);
     margin-bottom:         22px;
 }
- 
+
 .footer-logo {
     display:       block;
     font-family:   var(--serif);
@@ -481,7 +528,7 @@ footer {
     line-height: 1.8;
     color:       rgba(255,255,255,0.4);
 }
- 
+
 .footer-col h4 {
     font-size:      0.7rem;
     font-weight:    600;
@@ -493,13 +540,13 @@ footer {
 .footer-col ul    { display: flex; flex-direction: column; gap: 9px; }
 .footer-col ul a  { font-size: 0.8rem; color: rgba(255,255,255,0.42); transition: color 0.25s; }
 .footer-col ul a:hover { color: var(--rose); }
- 
+
 .footer-newsletter-desc {
     font-size:     0.8rem;
     color:         rgba(255,255,255,0.42);
     margin-bottom: 14px;
 }
- 
+
 .newsletter-form { display: flex; }
 .newsletter-form input {
     flex:          1;
@@ -529,7 +576,7 @@ footer {
     transition:     background 0.25s;
 }
 .newsletter-form button:hover { background: var(--rose-dark); }
- 
+
 .footer-bottom {
     display:         flex;
     justify-content: space-between;
@@ -537,7 +584,7 @@ footer {
     font-size:       0.73rem;
     color:           rgba(255,255,255,0.22);
 }
- 
+
 /* ─── RESPONSIVE ─────────────────────────────────────────── */
 @media (max-width: 1100px) {
     .product-grid  { grid-template-columns: repeat(2, 1fr); }
@@ -548,7 +595,7 @@ footer {
     .testimonials,
     footer         { padding-left: 40px; padding-right: 40px; }
 }
- 
+
 @media (max-width: 900px) {
     .collection-grid        { grid-template-columns: 1fr; grid-template-rows: auto; min-height: auto; }
     .col-card--big          { grid-row: auto; }
@@ -557,7 +604,7 @@ footer {
     .testimonials-left      { flex: none; }
     .navbar ul              { display: none; }
 }
- 
+
 @media (max-width: 600px) {
     .navbar, .collections, .products,
     .testimonials, footer   { padding-left: 20px; padding-right: 20px; }
@@ -572,7 +619,7 @@ footer {
     .navbar                 { padding: 0 20px; height: 56px; }
     .btn-login              { display: none; }
 }
- 
+
 @media (max-width: 380px) {
     .product-grid { grid-template-columns: 1fr; }
 }
