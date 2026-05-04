@@ -28,8 +28,8 @@ public class HomeServlet extends HttpServlet {
         List<Category> categories = categoryDAO.getAllCategories();
 
         request.setAttribute("featuredProducts", featuredProducts);
-        request.setAttribute("categories",       categories);
-        request.setAttribute("activePage",       "home");
+        request.setAttribute("categories",categories);
+        request.setAttribute("activePage","home");
 
         request.getRequestDispatcher("/page/user/home.jsp").forward(request, response);
     }

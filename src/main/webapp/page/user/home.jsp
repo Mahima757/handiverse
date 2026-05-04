@@ -10,9 +10,9 @@
 </head>
 <body>
 
-<!-- =================
-     NAVBAR  
-====================== -->
+<!-- ================================================
+     NAVBAR  (unchanged — your original code)
+================================================ -->
 <nav class="navbar">
 
     <div class="logo">HandiVerse</div>
@@ -44,12 +44,20 @@
 
 </nav>
 
-
 <!-- ================================================
      HERO
 ================================================ -->
 <section class="hero">
+
+    <%-- Background image as <img> tag so contextPath works correctly --%>
+    <img
+        class="hero-bg-img"
+        src="${pageContext.request.contextPath}/resources/background.png" alt="Handmade pottery and crafts from Nepal">
+
+    <%-- Dark overlay on top of image --%>
     <div class="hero-overlay"></div>
+
+    <%-- Centered text content --%>
     <div class="hero-content">
         <p class="hero-eyebrow">Welcome to the Gallery</p>
         <h1>Handmade with Love</h1>
@@ -62,6 +70,7 @@
             <a class="btn-outline" href="${pageContext.request.contextPath}/about">Explore Story</a>
         </div>
     </div>
+
 </section>
 
 
@@ -102,18 +111,18 @@
             <c:otherwise>
                 <!-- Static fallback cards -->
                 <a href="${pageContext.request.contextPath}/shop" class="col-card col-card--big">
-                    <img src="${pageContext.request.contextPath}/images/pottery.jpg" alt="Pottery">
+                    <img src="${pageContext.request.contextPath}/resources/potteryhome.jpeg" alt="Pottery">
                     <div class="col-label">
                         <h3>Pottery</h3>
                         <p>Earth and fire transformed into timeless vessels.</p>
                     </div>
                 </a>
                 <a href="${pageContext.request.contextPath}/shop" class="col-card col-card--small">
-                    <img src="${pageContext.request.contextPath}/images/crochet.jpg" alt="Crochet">
+                    <img src="${pageContext.request.contextPath}/resources/crochethome.png" alt="Crochet">
                     <div class="col-label"><h3>Crochet</h3></div>
                 </a>
                 <a href="${pageContext.request.contextPath}/shop" class="col-card col-card--small">
-                    <img src="${pageContext.request.contextPath}/images/wood.jpg" alt="Woodwork">
+                    <img src="${pageContext.request.contextPath}/resources/woodworkhome.png" alt="Woodwork">
                     <div class="col-label"><h3>Woodwork</h3></div>
                 </a>
             </c:otherwise>
@@ -204,9 +213,9 @@
                 curve. HandiVerse has changed how I curate my home.
             </p>
             <div class="testi-author">
-                <img src="${pageContext.request.contextPath}/images/avatars/sarah.jpg"
+                <img src="${pageContext.request.contextPath}/resources/avatar1.jpeg"
                      alt="Sarah Mitchell"
-                     onerror="this.src='${pageContext.request.contextPath}/images/avatar-default.png'">
+                     onerror="this.src='${pageContext.request.contextPath}/resources/avatar-default.png'">
                 <div>
                     <strong>Sarah Mitchell</strong>
                     <span>Art Collector</span>
@@ -222,7 +231,7 @@
                 artisans while elevating your living space.
             </p>
             <div class="testi-author">
-                <img src="${pageContext.request.contextPath}/images/avatars/julian.jpg"
+                <img src="${pageContext.request.contextPath}/resources/avatar2.jpeg"
                      alt="Julian Chen"
                      onerror="this.src='${pageContext.request.contextPath}/images/avatar-default.png'">
                 <div>
@@ -256,7 +265,6 @@
             <h4>Explore</h4>
             <ul>
                 <li><a href="${pageContext.request.contextPath}/shop">Ceramics</a></li>
-                <li><a href="${pageContext.request.contextPath}/shop">Textiles</a></li>
                 <li><a href="${pageContext.request.contextPath}/shop">Paintings</a></li>
                 <li><a href="${pageContext.request.contextPath}/shop">Woodwork</a></li>
             </ul>
