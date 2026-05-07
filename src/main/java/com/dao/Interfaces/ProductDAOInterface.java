@@ -13,4 +13,10 @@ public interface ProductDAOInterface {
     boolean updateProduct(Product product);
 
     boolean deleteProduct(int id);
+
+	int getTotalProducts();
+
+	List<Product> searchProducts(String keyword);
+
+	List<Product> getProductsByCategory(int categoryId);
 }

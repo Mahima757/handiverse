@@ -11,7 +11,7 @@
 <body>
 
 <!-- ================================================
-     NAVBAR  (unchanged — your original code)
+     NAVBAR 
 ================================================ -->
 <nav class="navbar">
 
@@ -168,7 +168,7 @@
                     <div class="product-card">
 
                         <div class="product-img-wrap">
-                            <img src="${pageContext.request.contextPath}/images/products/${p.image}"
+                            <img src="${pageContext.request.contextPath}/resources/products/${p.image}"
                                  alt="${p.productName}"
                                  onerror="this.src='${pageContext.request.contextPath}/images/placeholder.png'">
                             <span class="product-badge">New</span>
@@ -281,7 +281,7 @@
             <ul>
                 <li><a href="${pageContext.request.contextPath}/shop">Ceramics</a></li>
                 <li><a href="${pageContext.request.contextPath}/shop">Paintings</a></li>
-                <li><a href="${pageContext.request.contextPath}/shop">Woodwork</a></li>
+                <li><a href="${pageContext.request.contextPath}/shop">Handicrafts</a></li>
             </ul>
         </div>
 
