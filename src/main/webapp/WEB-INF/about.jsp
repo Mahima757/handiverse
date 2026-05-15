@@ -37,6 +37,11 @@ body{
     color:#8a6a6a;
 }
 
+.nav-links{
+    display:flex;
+    align-items:center;
+}
+
 .nav-links a{
     text-decoration:none;
     margin-left:25px;
@@ -129,7 +134,7 @@ body{
     color:#666;
 }
 
-/* Contact */
+/* Contact Section */
 
 .contact{
     width:90%;
@@ -211,11 +216,17 @@ footer{
     <div class="logo">Handiverse</div>
 
     <div class="nav-links">
-        <a href="#">HOME</a>
-        <a href="#">SHOP</a>
+
+        <a href="home">HOME</a>
+
+        <a href="shop">SHOP</a>
+
         <a href="#">CATEGORIES</a>
-        <a href="#">ABOUT</a>
+
+        <a href="about">ABOUT</a>
+
         <a href="#">CONTACT</a>
+
     </div>
 
 </div>
