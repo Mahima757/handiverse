@@ -92,6 +92,33 @@ body{
     object-fit:cover;
 }
 
+/* Mission Section */
+
+.mission{
+    width:90%;
+    margin:80px auto;
+}
+
+.mission-box{
+    background:white;
+    padding:50px;
+    border-radius:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    text-align:center;
+}
+
+.mission-box h2{
+    font-size:40px;
+    margin-bottom:25px;
+    color:#8a6a6a;
+}
+
+.mission-box p{
+    font-size:18px;
+    line-height:1.8;
+    color:#666;
+}
+
 /* Ethos Section */
 
 .ethos{
@@ -134,65 +161,6 @@ body{
     color:#666;
 }
 
-/* Contact Section */
-
-.contact{
-    width:90%;
-    margin:100px auto;
-    display:flex;
-    gap:50px;
-}
-
-.contact-left{
-    flex:1;
-}
-
-.contact-left h2{
-    font-size:45px;
-    margin-bottom:30px;
-    color:#222;
-}
-
-.contact-left p{
-    line-height:1.8;
-    margin-bottom:25px;
-    color:#666;
-    font-size:18px;
-}
-
-.contact-right{
-    flex:1;
-    background:#fff;
-    padding:40px;
-    border-radius:20px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
-
-.contact-right input,
-.contact-right textarea{
-    width:100%;
-    padding:15px;
-    margin-bottom:20px;
-    border:1px solid #ddd;
-    border-radius:10px;
-    outline:none;
-}
-
-.contact-right button{
-    width:100%;
-    padding:15px;
-    border:none;
-    background:#8a6a6a;
-    color:white;
-    border-radius:10px;
-    font-size:16px;
-    cursor:pointer;
-}
-
-.contact-right button:hover{
-    background:#6f5454;
-}
-
 /* Footer */
 
 footer{
@@ -217,13 +185,13 @@ footer{
 
     <div class="nav-links">
 
-        <a href="home">HOME</a>
+        <a href="/Project/home">HOME</a>
 
-        <a href="shop">SHOP</a>
+        <a href="/Project/shop">SHOP</a>
 
         <a href="#">CATEGORIES</a>
 
-        <a href="about">ABOUT</a>
+        <a href="/Project/about">ABOUT</a>
 
         <a href="#">CONTACT</a>
 
@@ -254,6 +222,23 @@ footer{
     <div class="hero-image">
 
         <img src="resources/potteryhome.jpeg" alt="Pottery Image">
+
+    </div>
+
+</div>
+
+<!-- Mission Section -->
+
+<div class="mission">
+
+    <div class="mission-box">
+
+        <h2>Our Mission</h2>
+
+        <p>
+            The main mission of Handiverse is to provide an efficient online platform for managing and promoting handmade products.
+            The system helps users browse handcrafted items easily while supporting artisans in organizing and showcasing their products digitally.
+        </p>
 
     </div>
 
@@ -296,36 +281,6 @@ footer{
             </p>
 
         </div>
-
-    </div>
-
-</div>
-
-<!-- Contact Section -->
-
-<div class="contact">
-
-    <div class="contact-left">
-
-        <h2>Get in Touch</h2>
-
-        <p>Email: handiverse@gmail.com</p>
-
-        <p>Phone: +977 9800000000</p>
-
-        <p>Location: Nepal</p>
-
-    </div>
-
-    <div class="contact-right">
-
-        <input type="text" placeholder="Your Name">
-
-        <input type="email" placeholder="Your Email">
-
-        <textarea rows="6" placeholder="Your Message"></textarea>
-
-        <button>Send Message</button>
 
     </div>
 
