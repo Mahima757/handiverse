@@ -1,4 +1,5 @@
 package com.dao;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,141 +9,257 @@ import com.dao.Interfaces.UserDAOInterface;
 
 public class UserDAO implements UserDAOInterface {
 
-	 Connection conn = DBConnection.getConnection();
+    Connection conn = DBConnection.getConnection();
 
-	    // INSERT USER
-	    @Override
-	    public boolean addUser(User user) {
+    // INSERT USER (with User object)
+    @Override
+    public boolean addUser(User user) {
 
-	        String sql =
-	            "INSERT INTO users(full_name,email,password,role) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO users(full_name, email, password, role) VALUES(?,?,?,?)";
 
-	        try {
+        try {
 
-	            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = conn.prepareStatement(sql);
 
-	            ps.setString(1, user.getFullName());
-	            ps.setString(2, user.getEmail());
-	            ps.setString(3, user.getPassword());
-	            ps.setString(4, user.getRole());
+            ps.setString(1, user.getFullName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
+            ps.setString(4, user.getRole());
 
-	            ps.executeUpdate();
-	            return true;
+            ps.executeUpdate();
+            return true;
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	        return false;
-	    }
+        return false;
+    }
 
-	    // GET ALL USERS
-	    @Override
-	    public List<User> getAllUsers() {
+    // ADD USER — called by RegisterServlet
+    // Returns: 1 = success | 2 = email already exists | 0 = server error
+    public int addUser(String fullName, String hashedPassword, String email) {
 
-	        List<User> list = new ArrayList<>();
-	        String sql = "SELECT * FROM users";
+        if (emailExists(email)) {
+            return 2;
+        }
 
-	        try {
+        String sql = "INSERT INTO users(full_name, email, password, role) VALUES(?,?,?,?)";
 
-	            Statement st = conn.createStatement();
-	            ResultSet rs = st.executeQuery(sql);
+        try {
 
-	            while (rs.next()) {
+            PreparedStatement ps = conn.prepareStatement(sql);
 
-	                User user = new User(
-	                        rs.getInt("id"),
-	                        rs.getString("full_name"),
-	                        rs.getString("email"),
-	                        rs.getString("password"),
-	                        rs.getString("role")
-	                );
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, hashedPassword);
+            ps.setString(4, "customer");    // default role for new registrations
 
-	                list.add(user);
-	            }
+            int rows = ps.executeUpdate();
+            return rows > 0 ? 1 : 0;
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	        return list;
-	    }
+        return 0;
+    }
 
-	    // GET USER BY ID
-	    @Override
-	    public User getUserById(int id) {
+    // GET ALL USERS
+    @Override
+    public List<User> getAllUsers() {
 
-	        String sql = "SELECT * FROM users WHERE id=?";
-	        User user = null;
+        List<User> list = new ArrayList<>();
 
-	        try {
+        String sql = "SELECT * FROM users";
 
-	            PreparedStatement ps = conn.prepareStatement(sql);
-	            ps.setInt(1, id);
+        try {
 
-	            ResultSet rs = ps.executeQuery();
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
 
-	            if (rs.next()) {
-	                user = new User(
-	                        rs.getInt("id"),
-	                        rs.getString("name"),
-	                        rs.getString("email"),
-	                        rs.getString("password"),
-	                        rs.getString("role")
-	                );
-	            }
+            while (rs.next()) {
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+                User user = new User(
+                        rs.getInt("id"),
+                        rs.getString("full_name"),  // BUG WAS: "name"
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("role")
+                );
 
-	        return user;
-	    }
+                list.add(user);
+            }
 
-	    // UPDATE USER
-	    @Override
-	    public boolean updateUser(User user) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	        String sql = "UPDATE users SET name=?, email=?, password=? WHERE id=?";
+        return list;
+    }
 
-	        try {
+    // GET USER BY ID
+    @Override
+    public User getUserById(int id) {
 
-	            PreparedStatement ps = conn.prepareStatement(sql);
-                
-	            ps.setInt(1, user.getUserId());
-	            ps.setString(2, user.getFullName());
-	            ps.setString(3, user.getEmail());
-	            ps.setString(4, user.getPassword());
-                ps.setString(5, user.getRole());
-	            ps.executeUpdate();
-	            return true;
+        String sql = "SELECT * FROM users WHERE id=?";
+        User user = null;
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+        try {
 
-	        return false;
-	    }
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
 
-	    // DELETE USER
-	    @Override
-	    public boolean deleteUser(int id) {
+            ResultSet rs = ps.executeQuery();
 
-	        String sql = "DELETE FROM users WHERE id=?";
+            if (rs.next()) {
 
-	        try {
+                user = new User(
+                        rs.getInt("id"),
+                        rs.getString("full_name"),  // BUG WAS: "name"
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("role")
+                );
+            }
 
-	            PreparedStatement ps = conn.prepareStatement(sql);
-	            ps.setInt(1, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	            ps.executeUpdate();
-	            return true;
+        return user;
+    }
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+    // GET USER BY EMAIL — used by LoginServlet
+    public User getUserByEmail(String email) {
 
-	        return false;
-	    }
-	}
+        String sql = "SELECT * FROM users WHERE email=?";
+        User user = null;
 
+        try {
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                user = new User(
+                        rs.getInt("id"),
+                        rs.getString("full_name"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("role")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
+    // GET USER BY USERNAME
+    @Override
+    public User getUser(String userName) {
+
+        String sql = "SELECT * FROM users WHERE full_name=?";
+        User user = null;
+
+        try {
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, userName);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                user = new User(
+                        rs.getInt("id"),
+                        rs.getString("full_name"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("role")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
+    // EMAIL EXISTS CHECK
+    public boolean emailExists(String email) {
+
+        String sql = "SELECT COUNT(*) FROM users WHERE email=?";
+
+        try {
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // UPDATE USER
+    @Override
+    public boolean updateUser(User user) {
+
+        String sql = "UPDATE users SET full_name=?, email=?, password=?, role=? WHERE id=?";
+
+        try {
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, user.getFullName());  // BUG WAS: setInt(1, userId)
+            ps.setString(2, user.getEmail());      // BUG WAS: wrong index
+            ps.setString(3, user.getPassword());   // BUG WAS: wrong index
+            ps.setString(4, user.getRole());       // BUG WAS: index 5 (out of range)
+            ps.setInt(5,    user.getUserId());     // BUG WAS: index 4
+
+            ps.executeUpdate();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // DELETE USER
+    @Override
+    public boolean deleteUser(int id) {
+
+        String sql = "DELETE FROM users WHERE id=?";
+
+        try {
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+
+            ps.executeUpdate();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+}
