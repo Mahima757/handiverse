@@ -1,98 +1,87 @@
 package com.controller;
 
-import com.Utilities.PasswordUtility;
-import com.Utilities.ValidationUtil;
-import com.dao.UserDAO;
-
+import com.Utilities.DBConnection;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
+import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
+import java.sql.*;
 
-@WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
+@WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
-
-    // JSP location: src/main/webapp/WEB-INF/pages/register.jsp
-    private static final String REGISTER_JSP = "/WEB-INF/register.jsp";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher(REGISTER_JSP).forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/register.jsp")
+               .forward(request, response);
+        System.out.println("REGISTER PAGE LOADED");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	
+    	 String fullName = request.getParameter("fullName");
+         String email = request.getParameter("email");
+         String password = request.getParameter("password");
+    		
+        try {
+            Connection conn = DBConnection.getConnection();
 
-        // ── Read form fields ──────────────────────────────────
-        final String userName   = request.getParameter("username");
-        final String email      = request.getParameter("email");
-        final String password   = request.getParameter("password");
-        final String cfPassword = request.getParameter("cpassword");
+            if (conn == null) {
+                request.setAttribute("error", "Database connection failed.");
+                request.getRequestDispatcher("/WEB-INF/register.jsp")
+                       .forward(request, response);
+                return;
+            }
 
-        // ── Server-side Validation ────────────────────────────
+            // Check whether email already exists
+            String checkSql = "SELECT * FROM users WHERE Email = ?";
+            PreparedStatement checkPs = conn.prepareStatement(checkSql);
+            checkPs.setString(1, email);
 
-        // 1. Name: not empty, alphanumeric starting with letter, at least 5 chars
-        final boolean isValidName = !ValidationUtil.isNullOrEmpty(userName)
-                && ValidationUtil.isAlphanumericStartingWithLetter(userName)
-                && userName.length() > 5;
-        String errorUser = isValidName ? "" : "Name not Proper! ";
+            ResultSet rs = checkPs.executeQuery();
+           
 
-        // 2. Email
-        final boolean isValidMail = ValidationUtil.isValidEmail(email);
-        String errorMail = isValidMail ? "" : "Mail not Proper! ";
+            if (rs.next()) {
+                request.setAttribute("error", "Email already exists");
+                request.getRequestDispatcher("/WEB-INF/register.jsp")
+                       .forward(request, response);
+                return;
+            }
 
-        // 3. Password: min 6 chars, 1 capital, 1 number, 1 symbol
-        final boolean isValidPass = ValidationUtil.isValidPassword(password);
-        String errorPass = isValidPass ? "" : "Password not Proper! ";
+         // Insert new user
+            String insertSql = "INSERT INTO users (Full_Name, Email, Password, role) VALUES (?, ?, ?, ?)";
+            PreparedStatement ps = conn.prepareStatement(insertSql);
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, password);
+            ps.setString(4, "USER");
 
-        // 4. Confirm password
-        final boolean isValidCon = ValidationUtil.doPasswordsMatch(password, cfPassword);
-        String errorCon = isValidCon ? "" : "Password not matching! ";
 
-        String error_ = errorUser + errorMail + errorPass + errorCon;
+            int rows = ps.executeUpdate();
+            
+            if (rows > 0) {
+                request.setAttribute("success", "Registration successful. Please login.");
+                request.getRequestDispatcher("/WEB-INF/login.jsp")
+                       .forward(request, response);
+                
+            } else {
+            	   request.setAttribute("error", "Registration failed. Please try again.");
+                request.getRequestDispatcher("/WEB-INF/register.jsp")
+                       .forward(request, response);
+            }
+            
 
-        // Pass errors and repopulate fields
-        request.setAttribute("error",     error_);
-        request.setAttribute("erUser",    errorUser);
-        request.setAttribute("erMail",    errorMail);
-        request.setAttribute("erPass",    errorPass);
-        request.setAttribute("erCon",     errorCon);
-        request.setAttribute("prevName",  userName);
-        request.setAttribute("prevEmail", email);
-
-        // ── Validation failed — go back to register page ──────
-        if (!error_.isBlank()) {
-            request.getRequestDispatcher(REGISTER_JSP).forward(request, response);
-            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Server error. Please check database connection and column names.");
+            request.getRequestDispatcher("/WEB-INF/register.jsp")
+                   .forward(request, response);
         }
-
-        // ── Hash password and save ────────────────────────────
-        String hashedPassword = PasswordUtility.getHashPassword(password);
-
-        UserDAO userDAO = new UserDAO();
-        int check = userDAO.addUser(userName, hashedPassword, email);
-
-        switch (check) {
-
-            case 1:
-                // Success — redirect to login
-                response.sendRedirect(request.getContextPath() + "/login");
-                break;
-
-            case 2:
-                // Email already registered
-                request.setAttribute("error", "User/Email already present!");
-                request.getRequestDispatcher(REGISTER_JSP).forward(request, response);
-                break;
-
-            default:
-                // Server/DB error
-                request.setAttribute("error", "Something went wrong. Please try again.");
-                request.getRequestDispatcher(REGISTER_JSP).forward(request, response);
-                break;
+            
         }
-    }
 }
