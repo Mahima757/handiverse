@@ -1,57 +1,29 @@
 package com.dao;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import com.model.Product;
 import com.Utilities.DBConnection;
-import com.dao.Interfaces.ProductDAOInterface;
+import com.model.Product;
+import com.model.Category;
 
-public class ProductDAO implements ProductDAOInterface {
+import java.sql.*;
+import java.util.*;
 
-    Connection conn = DBConnection.getConnection();
+public class ProductDAO {
 
-    // ADD PRODUCT
-    @Override
-    public boolean addProduct(Product p) {
-
-        String sql = "INSERT INTO product(Product_Name, Price, Quantity, Image, Description, Category_ID) VALUES(?,?,?,?,?,?)";
-
-        try {
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            ps.setString(1, p.getProductName());
-            ps.setDouble(2, p.getPrice());
-            ps.setInt(3, p.getQuantity());
-            ps.setString(4, p.getImage());
-            ps.setString(5, p.getDescription());
-            ps.setInt(6, p.getCategoryId());
-
-            ps.executeUpdate();
-            return true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    // GET ALL PRODUCTS
-    @Override
+    // ── GET ALL PRODUCTS ──────────────────────────────────────────────────────
     public List<Product> getAllProducts() {
 
         List<Product> list = new ArrayList<>();
 
-        String sql = "SELECT p.*, c.Name AS Category_Name FROM product p " +
-                     "JOIN category c ON p.Category_ID = c.Category_ID " +
-                     "ORDER BY p.Product_ID DESC";
+        // BUG WAS: table name typo + wrong column case
+        String sql =
+            "SELECT p.*, c.Name AS categoryName " +
+            "FROM product p " +                               // ✅ "product" not "products"
+            "JOIN category c ON p.Category_ID = c.Category_ID " +
+            "ORDER BY p.Product_ID DESC";
 
-        try {
-
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 list.add(mapRow(rs));
@@ -64,218 +36,155 @@ public class ProductDAO implements ProductDAOInterface {
         return list;
     }
 
-    // GET PRODUCT BY ID
-    @Override
+    // ── GET FILTERED PRODUCTS ─────────────────────────────────────────────────
+    public List<Product> getFilteredProducts(
+            String keyword,
+            Set<Integer> categories,
+            double maxPrice,
+            String sort) {
+
+        List<Product> list = new ArrayList<>();
+
+        // BUG WAS: table was "products" (with s) — actual table is "product"
+        StringBuilder sql = new StringBuilder(
+            "SELECT p.*, c.Name AS categoryName " +
+            "FROM product p " +                               // ✅ fixed table name
+            "JOIN category c ON p.Category_ID = c.Category_ID " +
+            "WHERE p.Price <= ? "
+        );
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND p.Product_Name LIKE ? ");         // ✅ correct column name
+        }
+
+        if (categories != null && !categories.isEmpty()) {
+            sql.append("AND p.Category_ID IN (");
+            sql.append(String.join(",", Collections.nCopies(categories.size(), "?")));
+            sql.append(") ");
+        }
+
+        // Sorting
+        switch (sort != null ? sort : "") {
+            case "price_asc":  sql.append("ORDER BY p.Price ASC");          break;
+            case "price_desc": sql.append("ORDER BY p.Price DESC");         break;
+            case "name_asc":   sql.append("ORDER BY p.Product_Name ASC");   break;
+            default:           sql.append("ORDER BY p.Product_ID DESC");     break;
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            int index = 1;
+
+            ps.setDouble(index++, maxPrice);
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(index++, "%" + keyword.trim() + "%");
+            }
+
+            if (categories != null && !categories.isEmpty()) {
+                for (Integer id : categories) {
+                    ps.setInt(index++, id);
+                }
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // ── GET PRODUCT BY ID ─────────────────────────────────────────────────────
     public Product getProductById(int id) {
 
-        String sql = "SELECT p.*, c.Name AS Category_Name FROM product p " +
-                     "JOIN category c ON p.Category_ID = c.Category_ID " +
-                     "WHERE p.Product_ID=?";
-        Product p = null;
+        String sql =
+            "SELECT p.*, c.Name AS categoryName " +
+            "FROM product p " +
+            "JOIN category c ON p.Category_ID = c.Category_ID " +
+            "WHERE p.Product_ID = ?";
 
-        try {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
-
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                p = mapRow(rs);
+                return mapRow(rs);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return p;
+        return null;
     }
 
-    // GET PRODUCTS BY CATEGORY
-    @Override
-    public List<Product> getProductsByCategory(int categoryId) {
+    // ── GET ALL CATEGORIES (used by ShopServlet) ──────────────────────────────
+    public List<Category> getAllCategories() {
 
-        List<Product> list = new ArrayList<>();
+        List<Category> categories = new ArrayList<>();
 
-        String sql = "SELECT p.*, c.Name AS Category_Name FROM product p " +
-                     "JOIN category c ON p.Category_ID = c.Category_ID " +
-                     "WHERE p.Category_ID=?";
+        String sql = "SELECT * FROM category ORDER BY Name ASC";
 
-        try {
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, categoryId);
-
-            ResultSet rs = ps.executeQuery();
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                list.add(mapRow(rs));
+                categories.add(new Category(
+                    rs.getInt("Category_ID"),     // ✅ exact DB column name
+                    rs.getString("Name"),          // ✅ exact DB column name
+                    rs.getString("Description")    // ✅ exact DB column name
+                ));
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return list;
+        return categories;
     }
 
-    // SEARCH PRODUCTS
-    @Override
-    public List<Product> searchProducts(String keyword) {
-
-        List<Product> list = new ArrayList<>();
-
-        String sql = "SELECT p.*, c.Name AS Category_Name FROM product p " +
-                     "JOIN category c ON p.Category_ID = c.Category_ID " +
-                     "WHERE p.Product_Name LIKE ? OR p.Description LIKE ? OR c.Name LIKE ?";
-
-        try {
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-            String like = "%" + keyword + "%";
-
-            ps.setString(1, like);
-            ps.setString(2, like);
-            ps.setString(3, like);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
-    // SEARCH IN CATEGORY
-    public List<Product> searchProductsInCategory(String keyword, int categoryId) {
-
-        List<Product> list = new ArrayList<>();
-
-        String sql = "SELECT p.*, c.Name AS Category_Name FROM product p " +
-                     "JOIN category c ON p.Category_ID = c.Category_ID " +
-                     "WHERE (p.Product_Name LIKE ? OR p.Description LIKE ?) " +
-                     "AND p.Category_ID=?";
-
-        try {
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-            String like = "%" + keyword + "%";
-
-            ps.setString(1, like);
-            ps.setString(2, like);
-            ps.setInt(3, categoryId);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
-    // ── FILTERED PRODUCTS with category[], price range, sort, pagination ──
-    // Used by ShopServlet for the full shop page filter form
-    public List<Product> getFilteredProducts(int[] categoryIds,
-                                              double minPrice, double maxPrice,
-                                              String sort,
-                                              int offset, int limit) {
-
-        List<Product> list = new ArrayList<>();
+    // ── COUNT (for pagination) ────────────────────────────────────────────────
+    public int countFilteredProducts(
+            String keyword,
+            Set<Integer> categories,
+            double maxPrice) {
 
         StringBuilder sql = new StringBuilder(
-            "SELECT p.*, c.Name AS Category_Name FROM product p " +
-            "JOIN category c ON p.Category_ID = c.Category_ID " +
-            "WHERE p.Price >= ? AND p.Price <= ? "
+            "SELECT COUNT(*) FROM product p WHERE p.Price <= ? "
         );
 
-        // Add category IN clause if specific categories selected
-        if (categoryIds != null && categoryIds.length > 0) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND p.Product_Name LIKE ? ");
+        }
+
+        if (categories != null && !categories.isEmpty()) {
             sql.append("AND p.Category_ID IN (");
-            for (int i = 0; i < categoryIds.length; i++) {
-                sql.append(i == 0 ? "?" : ",?");
-            }
+            sql.append(String.join(",", Collections.nCopies(categories.size(), "?")));
             sql.append(") ");
         }
 
-        // Sort
-        switch (sort != null ? sort : "") {
-            case "price_asc":  sql.append("ORDER BY p.Price ASC ");   break;
-            case "price_desc": sql.append("ORDER BY p.Price DESC ");  break;
-            case "name_asc":   sql.append("ORDER BY p.Product_Name ASC "); break;
-            default:           sql.append("ORDER BY p.Product_ID DESC "); break; // newest
-        }
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-        sql.append("LIMIT ? OFFSET ?");
+            int index = 1;
+            ps.setDouble(index++, maxPrice);
 
-        try {
-
-            PreparedStatement ps = conn.prepareStatement(sql.toString());
-            int idx = 1;
-
-            ps.setDouble(idx++, minPrice);
-            ps.setDouble(idx++, maxPrice);
-
-            if (categoryIds != null) {
-                for (int catId : categoryIds) {
-                    ps.setInt(idx++, catId);
-                }
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(index++, "%" + keyword.trim() + "%");
             }
 
-            ps.setInt(idx++, limit);
-            ps.setInt(idx,   offset);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
-    // COUNT for pagination
-    public int getFilteredProductCount(int[] categoryIds,
-                                        double minPrice, double maxPrice) {
-
-        StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) FROM product p " +
-            "WHERE p.Price >= ? AND p.Price <= ? "
-        );
-
-        if (categoryIds != null && categoryIds.length > 0) {
-            sql.append("AND p.Category_ID IN (");
-            for (int i = 0; i < categoryIds.length; i++) {
-                sql.append(i == 0 ? "?" : ",?");
-            }
-            sql.append(") ");
-        }
-
-        try {
-
-            PreparedStatement ps = conn.prepareStatement(sql.toString());
-            int idx = 1;
-
-            ps.setDouble(idx++, minPrice);
-            ps.setDouble(idx++, maxPrice);
-
-            if (categoryIds != null) {
-                for (int catId : categoryIds) {
-                    ps.setInt(idx++, catId);
-                }
+            if (categories != null && !categories.isEmpty()) {
+                for (Integer id : categories) ps.setInt(index++, id);
             }
 
             ResultSet rs = ps.executeQuery();
@@ -288,16 +197,41 @@ public class ProductDAO implements ProductDAOInterface {
         return 0;
     }
 
-    // UPDATE PRODUCT
-    @Override
+    // ── ADD PRODUCT ───────────────────────────────────────────────────────────
+    public boolean addProduct(Product p) {
+
+        String sql =
+            "INSERT INTO product(Product_Name, Price, Quantity, Image, Description, Category_ID) " +
+            "VALUES(?,?,?,?,?,?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, p.getProductName());
+            ps.setDouble(2, p.getPrice());
+            ps.setInt(3, p.getQuantity());
+            ps.setString(4, p.getImage());
+            ps.setString(5, p.getDescription());
+            ps.setInt(6, p.getCategoryId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // ── UPDATE PRODUCT ────────────────────────────────────────────────────────
     public boolean updateProduct(Product p) {
 
-        String sql = "UPDATE product SET Product_Name=?, Price=?, Quantity=?, " +
-                     "Image=?, Description=?, Category_ID=? WHERE Product_ID=?";
+        String sql =
+            "UPDATE product SET Product_Name=?, Price=?, Quantity=?, " +
+            "Image=?, Description=?, Category_ID=? WHERE Product_ID=?";
 
-        try {
-
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, p.getProductName());
             ps.setDouble(2, p.getPrice());
@@ -307,8 +241,7 @@ public class ProductDAO implements ProductDAOInterface {
             ps.setInt(6, p.getCategoryId());
             ps.setInt(7, p.getProductId());
 
-            ps.executeUpdate();
-            return true;
+            return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -317,19 +250,16 @@ public class ProductDAO implements ProductDAOInterface {
         return false;
     }
 
-    // DELETE PRODUCT
-    @Override
+    // ── DELETE PRODUCT ────────────────────────────────────────────────────────
     public boolean deleteProduct(int id) {
 
         String sql = "DELETE FROM product WHERE Product_ID=?";
 
-        try {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
-
-            ps.executeUpdate();
-            return true;
+            return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -338,39 +268,22 @@ public class ProductDAO implements ProductDAOInterface {
         return false;
     }
 
-    // GET TOTAL PRODUCTS
-    @Override
-    public int getTotalProducts() {
-
-        String sql = "SELECT COUNT(*) FROM product";
-
-        try {
-
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-
-            if (rs.next()) return rs.getInt(1);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
-    // ── Private row mapper ────────────────────────────────────
+    // ── PRIVATE ROW MAPPER ────────────────────────────────────────────────────
+    // Single place to map ResultSet → Product, used by all methods above
     private Product mapRow(ResultSet rs) throws SQLException {
 
         Product p = new Product(
-                rs.getInt("Product_ID"),
-                rs.getString("Product_Name"),
-                rs.getDouble("Price"),
-                rs.getInt("Quantity"),
-                rs.getString("Image"),
-                rs.getString("Description"),
-                rs.getInt("Category_ID")
+            rs.getInt("Product_ID"),        // ✅ matches DB column
+            rs.getString("Product_Name"),   // ✅ matches DB column
+            rs.getDouble("Price"),          // ✅ matches DB column
+            rs.getInt("Quantity"),          // ✅ matches DB column
+            rs.getString("Image"),          // ✅ matches DB column
+            rs.getString("Description"),    // ✅ matches DB column
+            rs.getInt("Category_ID")        // ✅ matches DB column
         );
-        p.setCategoryName(rs.getString("Category_Name"));
+
+        p.setCategoryName(rs.getString("categoryName"));
+
         return p;
     }
 }

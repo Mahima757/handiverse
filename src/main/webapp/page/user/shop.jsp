@@ -23,9 +23,8 @@
                class="${activePage eq 'home' ? 'active' : ''}">Home</a></li>
         <li><a href="${pageContext.request.contextPath}/shop"
                class="${activePage eq 'shop' ? 'active' : ''}">Shop</a></li>
-        <li><a href="#">Categories</a></li>
         <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
+        
     </ul>
 
     <div class="nav-auth">
@@ -114,10 +113,10 @@
                         min="0"
                         max="1000"
                         step="10"
-                        value="${not empty maxPrice ? maxPrice : 1000}">
+                        value="${not empty maxPrice ? maxPrice : 5000}">
                     <div class="price-labels">
-                        <span>$0</span>
-                        <span>$1,000+</span>
+                        <span>Rs.0</span>
+                        <span>Rs.5,000+</span>
                     </div>
                 </div>
             </div>
@@ -200,7 +199,7 @@
                                class="product-img-link">
                                 <div class="product-img-wrap">
                                     <img
-                                        src="${pageContext.request.contextPath}/images/products/${p.image}"
+                                        src="${pageContext.request.contextPath}/images/product/${p.image}"
                                         alt="${p.productName}"
                                         onerror="this.src='${pageContext.request.contextPath}/images/placeholder.png'">
                                     <c:if test="${p.quantity == 0}">
@@ -218,7 +217,7 @@
                                     </a>
                                 </h3>
                                 <p class="product-price">
-                                    $<fmt:formatNumber value="${p.price}" type="number" minFractionDigits="2"/>
+                                    Rs.<fmt:formatNumber value="${p.price}" type="number" minFractionDigits="2"/>
                                 </p>
                             </div>
 

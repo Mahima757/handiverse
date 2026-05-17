@@ -23,9 +23,7 @@
                class="${activePage eq 'home' ? 'active' : ''}">Home</a>
         </li>
         <li><a href="${pageContext.request.contextPath}/shop">Shop</a></li>
-        <li><a href="#">Categories</a></li>
         <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
     </ul>
 
     <div class="nav-auth">
@@ -126,18 +124,18 @@
             <c:otherwise>
                 <!-- Static fallback cards -->
                 <a href="${pageContext.request.contextPath}/shop" class="col-card col-card--big">
-                    <img src="${pageContext.request.contextPath}/resources/potteryhome.jpeg" alt="Pottery">
+                    <img src="${pageContext.request.contextPath}/images/home/potteryhome.jpeg" alt="Pottery">
                     <div class="col-label">
                         <h3>Pottery</h3>
                         <p>Earth and fire transformed into timeless vessels.</p>
                     </div>
                 </a>
                 <a href="${pageContext.request.contextPath}/shop" class="col-card col-card--small">
-                    <img src="${pageContext.request.contextPath}/resources/crochethome.png" alt="Crochet">
+                    <img src="${pageContext.request.contextPath}/images/home/crochethome.png" alt="Crochet">
                     <div class="col-label"><h3>Crochet</h3></div>
                 </a>
                 <a href="${pageContext.request.contextPath}/shop" class="col-card col-card--small">
-                    <img src="${pageContext.request.contextPath}/resources/woodworkhome.png" alt="Woodwork">
+                    <img src="${pageContext.request.contextPath}/images/home/woodworkhome.png" alt="Woodwork">
                     <div class="col-label"><h3>Woodwork</h3></div>
                 </a>
             </c:otherwise>
@@ -168,9 +166,9 @@
                     <div class="product-card">
 
                         <div class="product-img-wrap">
-                            <img src="${pageContext.request.contextPath}/resources/products/${p.image}"
+                            <img src="${pageContext.request.contextPath}/images/product/${p.image}"
                                  alt="${p.productName}"
-                                 onerror="this.src='${pageContext.request.contextPath}/images/placeholder.png'">
+                                 onerror="this.src='${pageContext.request.contextPath}/images/product/claypot.jpg'">
                             <span class="product-badge">New</span>
                         </div>
 
