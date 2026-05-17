@@ -27,6 +27,15 @@ public class RegisterServlet extends HttpServlet {
     	 String fullName = request.getParameter("fullName");
          String email = request.getParameter("email");
          String password = request.getParameter("password");
+         System.out.println("PASSWORD = " + password);
+         String salt = BCrypt.gensalt(12);
+         
+         String hashedPassword = BCrypt.hashpw(password, salt);
+         System.out.println("HASHED = " + hashedPassword);
+         System.out.println("SALT = " + salt);
+         System.out.println("PASSWORD = " + password);
+
+        
     		
         try {
             Connection conn = DBConnection.getConnection();
@@ -58,7 +67,7 @@ public class RegisterServlet extends HttpServlet {
             PreparedStatement ps = conn.prepareStatement(insertSql);
             ps.setString(1, fullName);
             ps.setString(2, email);
-            ps.setString(3, password);
+            ps.setString(3, hashedPassword);
             ps.setString(4, "USER");
 
 
@@ -76,12 +85,15 @@ public class RegisterServlet extends HttpServlet {
             }
             
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Server error. Please check database connection and column names.");
-            request.getRequestDispatcher("/WEB-INF/register.jsp")
-                   .forward(request, response);
-        }
+        }catch (Exception e) {
+                e.printStackTrace(); // prints to console
+
+                request.setAttribute("error", e.getMessage());
+
+                request.getRequestDispatcher("/WEB-INF/register.jsp")
+                       .forward(request, response);
+            }
+        
             
         }
 }

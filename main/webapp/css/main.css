@@ -1,0 +1,126 @@
+:root {
+  --color-bg-header: #f4f4f4;
+  --color-border-light: #ddd;
+  --color-border-dark: #000;
+
+  --color-navbar-bg: #222;
+  --color-footer-bg: #111;
+
+  --color-text-dark: #333;
+  --color-text-light: #ffffff;
+
+  --color-button-border: #333;
+  --color-button-hover-bg: #333;
+  --color-button-delete: rgba(255, 0, 0);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* heading of the page */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 40px;
+  background-color: var(--color-bg-header);
+  border-bottom: 1px solid var(--color-border-light);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo a {
+  text-decoration: none;
+}
+.logo h3 {
+  display: inline-block;
+  font-weight: 100;
+}
+
+.usersession {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* gap creates space between items of flex*/
+}
+
+.usersession h3 {
+  font-weight: 100;
+}
+
+.logout {
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--color-button-border);
+  color: var(--color-text-dark);
+}
+
+.logout:hover {
+  background-color: var(--color-button-hover-bg);
+  color: var(--color-text-light);
+}
+
+/* navigation bar */
+.navbar {
+  background-color: var(--color-navbar-bg);
+}
+
+/* make ul the main container for flex */
+.navbar ul {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 40px;
+  list-style: none;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  opacity: 0.7;
+}
+
+.navbar p {
+  color: var(--color-text-light);
+}
+
+/* the main contents change here*/
+.content {
+  flex: 1; /*as  container height is defined for this flex item */
+  padding: 5px;
+  max-width: 100%; /* max-width prevents horzontal scroll bar*/
+}
+
+/* footer always stays as bottom as content is flex 1 */
+.footer {
+  background-color: var(--color-footer-bg);
+  color: var(--color-text-light);
+  text-align: center;
+  padding: 5px;
+}
+
+@media (max-width: 700px) {
+  .logo h3 {
+    display: none;
+  }
+}

@@ -1,8 +1,8 @@
-package com.Utilities;
+package com.ingcollegeapt.week4twebapp.utilities;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-public class PasswordUtility {
+public class PasswordUtil {
     //best value is between 10 and 12 for time complexity and robustness
     // 2^COST times iteration for hashing, COST 10 and 11 means double iteration
     private final static int COST = 10;  

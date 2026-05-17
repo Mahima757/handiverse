@@ -1,0 +1,108 @@
+/*
+An element with width: 100% might still cause a horizontal scroll if you apply margin, padding, or border without using box-sizing: border-box. 
+By default (box-sizing: content-box), makes the total element width 100% + padding/border.
+Use box-sizing: border-box on element or universally!!
+*/
+
+@import url("main.css");
+
+/* the main contents change here*/
+.content {
+  flex: 1; /*as  container height is defined */
+  padding: 10px;
+  max-width: 100%; /* max-width prevents horizontal scroll bar*/
+  display: flex;
+  align-self: center;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box; /*When max and width are same, due to box model width> max-width so scroll. change to border-box*/
+}
+
+.search {
+  text-align: center;
+}
+
+.search input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-light);
+  width: 200px;
+}
+
+.search button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--color-button-border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.search button:hover {
+  background-color: var(--color-button-hover-bg);
+  color: var(--color-text-light);
+}
+
+.topicContainer {
+  border: 2px solid var(--color-border-dark);
+  margin: 15px auto;
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: column;
+  min-width: 40%;
+  min-height: 50%;
+}
+
+.topicItem {
+  display: flex;
+  gap: 10px;
+  margin: 2px 0;
+  padding: 5px;
+  border: 2px solid var(--color-border-dark);
+}
+
+.topicItem .topic {
+  text-decoration: none;
+  padding: 5px 0px 0px 0px;
+  flex: 1; /*grows on available space*/
+  overflow: hidden;
+}
+.topicItem .topic:hover {
+  text-decoration: underline;
+  color: var(--color-text-dark);
+}
+
+.topicItem .edit {
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--color-button-border);
+  color: var(--color-text-dark);
+}
+
+.topicItem .edit:hover {
+  background-color: var(--color-button-hover-bg);
+  color: var(--color-text-light);
+}
+
+.topicItem .submit {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 16px;
+  border: 1px solid var(--color-button-border);
+  color: var(--color-text-dark);
+}
+
+.topicItem .submit:hover {
+  background-color: var(--color-button-delete);
+  color: var(--color-text-light);
+}
+
+@media (max-width: 700px) {
+  .topicItem {
+    flex-wrap: wrap;
+    /* flex-direction: column; */
+  }
+  .topicItem .topic {
+    flex: 100%; /* 100% with flex wrap, this item takes all the width and edit and delete wraps down properly*/
+  }
+}

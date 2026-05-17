@@ -7,6 +7,8 @@ import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.sql.*;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
@@ -27,39 +29,58 @@ public class LoginServlet extends HttpServlet {
 
         try {
             Connection conn = DBConnection.getConnection();
-            
+
             if (conn == null) {
                 request.setAttribute("error", "Database connection failed.");
-                request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/login.jsp")
+                       .forward(request, response);
                 return;
             }
 
-            String sql = "SELECT * FROM users WHERE Email=? AND Password=?";
-            
+            // Find user by email only
+            String sql = "SELECT * FROM users WHERE Email=?";
+
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, email);
-            ps.setString(2, password);
 
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                HttpSession session = request.getSession();
-                session.setAttribute("user", rs.getString("email"));
-                session.setAttribute("role", rs.getString("role"));
 
-                response.sendRedirect(request.getContextPath() + "/home"); 
+                // Get hashed password from database
+                String dbPassword = rs.getString("Password");
+
+                // Compare entered password with hashed password
+                if (BCrypt.checkpw(password, dbPassword)) {
+
+                    HttpSession session = request.getSession();
+
+                    session.setAttribute("user", rs.getString("Email"));
+                    session.setAttribute("role", rs.getString("role"));
+
+                    response.sendRedirect(request.getContextPath() + "/home");
+
+                } else {
+                    request.setAttribute("error", "Invalid credentials");
+                    request.getRequestDispatcher("/WEB-INF/login.jsp")
+                           .forward(request, response);
+                }
 
             } else {
                 request.setAttribute("error", "Invalid credentials");
-                request.getRequestDispatcher("/home.jsp")
+                request.getRequestDispatcher("/WEB-INF/login.jsp")
                        .forward(request, response);
             }
 
         } catch (Exception e) {
+
             e.printStackTrace();
-            request.setAttribute("error", "Server error");
+
+            request.setAttribute("error", e.getMessage());
+
             request.getRequestDispatcher("/WEB-INF/login.jsp")
-                   .forward(request, response);  
+                   .forward(request, response);
         }
     }
+
 }
