@@ -12,11 +12,14 @@ import java.io.IOException;
 @WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
 public class RegisterServlet extends HttpServlet {
 
+    // JSP location: src/main/webapp/WEB-INF/pages/register.jsp
+    private static final String REGISTER_JSP = "/WEB-INF/register.jsp";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestDispatcher rd = request.getRequestDispatcher("register.jsp");
-        rd.forward(request, response);
+
+        request.getRequestDispatcher(REGISTER_JSP).forward(request, response);
     }
 
     @Override
@@ -31,7 +34,7 @@ public class RegisterServlet extends HttpServlet {
 
         // ── Server-side Validation ────────────────────────────
 
-        // 1. userName: not empty, alphanumeric starting with letter, at least 5 chars
+        // 1. Name: not empty, alphanumeric starting with letter, at least 5 chars
         final boolean isValidName = !ValidationUtil.isNullOrEmpty(userName)
                 && ValidationUtil.isAlphanumericStartingWithLetter(userName)
                 && userName.length() > 5;
@@ -51,48 +54,44 @@ public class RegisterServlet extends HttpServlet {
 
         String error_ = errorUser + errorMail + errorPass + errorCon;
 
-        request.setAttribute("error",  error_);
-        request.setAttribute("erUser", errorUser);
-        request.setAttribute("erMail", errorMail);
-        request.setAttribute("erPass", errorPass);
-        request.setAttribute("erCon",  errorCon);
+        // Pass errors and repopulate fields
+        request.setAttribute("error",     error_);
+        request.setAttribute("erUser",    errorUser);
+        request.setAttribute("erMail",    errorMail);
+        request.setAttribute("erPass",    errorPass);
+        request.setAttribute("erCon",     errorCon);
+        request.setAttribute("prevName",  userName);
+        request.setAttribute("prevEmail", email);
 
-        // ── If validation failed, go back to register page ────
+        // ── Validation failed — go back to register page ──────
         if (!error_.isBlank()) {
-            RequestDispatcher rd = request.getRequestDispatcher("/register.jsp");
-            rd.forward(request, response);
+            request.getRequestDispatcher(REGISTER_JSP).forward(request, response);
             return;
         }
 
-        // ── Hash password then save to DB ─────────────────────
+        // ── Hash password and save ────────────────────────────
         String hashedPassword = PasswordUtility.getHashPassword(password);
 
-        final UserDAO userDAO = new UserDAO();
+        UserDAO userDAO = new UserDAO();
         int check = userDAO.addUser(userName, hashedPassword, email);
-        //                          ^^^^^^^^
-        //                    FIX: was "fullName" (undefined variable)
-        //                         changed to "userName" which was declared above
 
         switch (check) {
 
             case 1:
                 // Success — redirect to login
-                response.sendRedirect("login.jsp");
+                response.sendRedirect(request.getContextPath() + "/login");
                 break;
 
             case 2:
                 // Email already registered
                 request.setAttribute("error", "User/Email already present!");
-                RequestDispatcher rdisp = request.getRequestDispatcher("/register.jsp");
-                rdisp.forward(request, response);
+                request.getRequestDispatcher(REGISTER_JSP).forward(request, response);
                 break;
 
             default:
                 // Server/DB error
-                System.out.println("Server error: " + check + " :error code");
                 request.setAttribute("error", "Something went wrong. Please try again.");
-                RequestDispatcher rdErr = request.getRequestDispatcher("/register.jsp");
-                rdErr.forward(request, response);
+                request.getRequestDispatcher(REGISTER_JSP).forward(request, response);
                 break;
         }
     }
