@@ -162,4 +162,150 @@ public class OrderDAO implements OrderDAOInterface {
 
         return false;
     }
+    
+    /**
+     * Sum of Total_Amount across ALL orders.
+     * Used for the "Total Revenue" stat card.
+     */
+    public double getTotalRevenue() {
+        String sql = "SELECT COALESCE(SUM(Total_Amount), 0) FROM orders";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+ 
+    /**
+     * Sum of Total_Amount for orders placed in the calendar month
+     * immediately before the current one.
+     * Used to compute the revenue % change badge.
+     */
+    public double getPreviousMonthRevenue() {
+        String sql =
+            "SELECT COALESCE(SUM(Total_Amount), 0) FROM orders " +
+            "WHERE YEAR(Order_Date)  = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) " +
+            "  AND MONTH(Order_Date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+ 
+    /**
+     * Total number of orders ever placed.
+     * Used for the "Total Orders" stat card.
+     */
+    public int getTotalOrderCount() {
+        String sql = "SELECT COUNT(*) FROM orders";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+ 
+    /**
+     * Number of orders placed in the previous calendar month.
+     * Used to compute the orders % change badge.
+     */
+    public int getPreviousMonthOrderCount() {
+        String sql =
+            "SELECT COUNT(*) FROM orders " +
+            "WHERE YEAR(Order_Date)  = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) " +
+            "  AND MONTH(Order_Date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+ 
+    /**
+     * Returns the most recent {@code limit} orders joined with the user's
+     * full name so the dashboard table can display the customer name.
+     *
+     * Assumes your users table has columns: User_ID, Full_Name (or First_Name/Last_Name).
+     * Adjust the JOIN and CONCAT below to match your actual users table column names.
+     */
+    public List<Order> getRecentOrders(int limit) {
+        List<Order> list = new ArrayList<>();
+        // Adjust "u.Full_Name" to match your users table — e.g. CONCAT(u.First_Name,' ',u.Last_Name)
+        String sql =
+            "SELECT o.Order_ID, o.User_ID, o.Order_Date, o.Total_Amount, o.Status, " +
+            "       u.Full_Name AS Customer_Name " +
+            "FROM orders o " +
+            "LEFT JOIN users u ON o.User_ID = u.User_ID " +
+            "ORDER BY o.Order_Date DESC " +
+            "LIMIT ?";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, limit);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Order order = new Order(
+                    rs.getInt("Order_ID"),
+                    rs.getInt("User_ID"),
+                    rs.getTimestamp("Order_Date"),
+                    rs.getDouble("Total_Amount"),
+                    rs.getString("Status")
+                );
+                order.setCustomerName(rs.getString("Customer_Name"));
+                list.add(order);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+ 
+    /**
+     * Returns an int[4] representing the order count for each of the
+     * four weeks in the current calendar month.
+     *
+     *   index 0 → days  1–7
+     *   index 1 → days  8–14
+     *   index 2 → days 15–21
+     *   index 3 → days 22–end
+     *
+     * Used to draw the Sales Growth line chart in the dashboard.
+     */
+    public int[] getWeeklySales() {
+        int[] weeks = new int[4];
+        String sql =
+            "SELECT " +
+            "  SUM(CASE WHEN DAY(Order_Date) BETWEEN  1 AND  7  THEN 1 ELSE 0 END) AS week1, " +
+            "  SUM(CASE WHEN DAY(Order_Date) BETWEEN  8 AND 14  THEN 1 ELSE 0 END) AS week2, " +
+            "  SUM(CASE WHEN DAY(Order_Date) BETWEEN 15 AND 21  THEN 1 ELSE 0 END) AS week3, " +
+            "  SUM(CASE WHEN DAY(Order_Date) >= 22               THEN 1 ELSE 0 END) AS week4  " +
+            "FROM orders " +
+            "WHERE YEAR(Order_Date)  = YEAR(CURRENT_DATE) " +
+            "  AND MONTH(Order_Date) = MONTH(CURRENT_DATE)";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                weeks[0] = rs.getInt("week1");
+                weeks[1] = rs.getInt("week2");
+                weeks[2] = rs.getInt("week3");
+                weeks[3] = rs.getInt("week4");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return weeks;
+}
 }

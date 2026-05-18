@@ -58,7 +58,14 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("user", rs.getString("Email"));
                     session.setAttribute("role", rs.getString("role"));
 
-                    response.sendRedirect(request.getContextPath() + "/home");
+                ;
+                	String role = rs.getString("role");
+                    if ("admin".equalsIgnoreCase(role)) {
+                        session.setAttribute("adminUser", rs.getString("Email"));
+                        response.sendRedirect(request.getContextPath() + "/dashboard");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/home");
+                    }
 
                 } else {
                     request.setAttribute("error", "Invalid credentials");
